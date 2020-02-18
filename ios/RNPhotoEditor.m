@@ -32,7 +32,7 @@ RCTResponseSenderBlock _onCancelEditing = nil;
     if (error != nil)
         NSLog(@"write error %@", error); 
    
-    _onDoneEditing(@[]);
+    _onDoneEditing(@[path]);
 }
 
 - (void)canceledEditing {
