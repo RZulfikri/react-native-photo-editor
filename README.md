@@ -31,7 +31,86 @@ This library is a React Native bridge around native photo editor libraries. It a
 
 ## 📖 Getting started
 
-`$ npm install react-native-photo-editor --save`
+`$ yarn add react-native-photo-editor`
+
+## **RN61 >= RNPE V1 >**
+
+> RN60 above please use `react-native-photo-editor` V1 and above
+
+- **iOS**
+
+> **iOS Prerequisite:** Please make sure `CocoaPods` is installed on your system
+
+	- Add the following to your `Podfile` -> `ios/Podfile` and run pod update:
+
+```
+  use_native_modules!
+
+  pod 'RNPhotoEditor', :path => '../node_modules/react-native-photo-editor/ios'
+
+  use_frameworks!
+
+  pod 'iOSPhotoEditor', :git => 'https://github.com/prscX/photo-editor', :branch => 'master'
+
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      if target.name.include?('iOSPhotoEditor')
+        target.build_configurations.each do |config|
+          config.build_settings['SWIFT_VERSION'] = '5'
+        end
+      end
+    end
+  end
+```
+  - If using React Native Firebase v6+, please see `Troubleshooting` section for a known issue before moving further.
+
+  - Add below property to your info.list
+
+```
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Application needs permission to write photos...</string>
+
+	<!-- If you are targeting devices running on iOS 10 or later, you'll also need to add: -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>iOS 10 needs permission to write photos...</string>
+```
+
+- **Android**
+
+- Please add below script in your build.gradle
+
+```
+buildscript {
+    repositories {
+        maven { url "https://jitpack.io" }
+        ...
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+        ...
+    }
+}
+```
+
+
+- Add below activity in your app activities:
+
+`
+<activity android:name="com.ahmedadeltito.photoeditor.PhotoEditorActivity" />
+<activity android:name="com.yalantis.ucrop.UCropActivity" />
+`
+
+- To save image to the public external storage, you must request the WRITE_EXTERNAL_STORAGE permission in your manifest file:
+
+`<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />`
+
+
+## **RN61 < RNPE V1 <**
+
+> RN60 below please use `react-native-photo-editor` V.0.*
 
 `$ react-native link react-native-photo-editor`
 
@@ -75,7 +154,10 @@ android {
 
 - Add below activity in your app activites:
 
-`<activity android:name="com.ahmedadeltito.photoeditor.PhotoEditorActivity" />`
+`
+<activity android:name="com.ahmedadeltito.photoeditor.PhotoEditorActivity" />
+<activity android:name="com.yalantis.ucrop.UCropActivity" />
+`
 
 - To save image to the public external storage, you must request the WRITE_EXTERNAL_STORAGE permission in your manifest file:
 
@@ -104,6 +186,16 @@ android {
 
   * Now build your iOS app through Xcode
 
+
+## ⛄️ Stickers
+
+If you want stickers, please add them to your native project:
+
+* **iOS:** Add stickers to iOS Resources folder
+* **Android:** Add stickers to app `drawable` folder
+
+> Refer Example project for the same.
+
 ## 💻 Usage
 
 ```
@@ -114,6 +206,9 @@ RNPhotoEditor.Edit({
 });
 ```
 
+> * Purpose of this library is to edit photos which are within app sandbox, we recommend to move captured image to app sandbox then using RNFS share image path with library for the edit.
+
+> * Example: If we capture image through cameraRoll then we should first move image to app sandbox using RNFS then share app storage path with the editor.
 
 ## 💡 Props
 
@@ -128,14 +223,26 @@ RNPhotoEditor.Edit({
 | `onDone`    | `func` |         | Specify done callback            |
 | `onCancel`        | `func`            |      | Specify cancel callback       |
 
+## 🔧 Troubleshooting
+### If using React Native Firebase v6+ or facing any of the following issues: [#104](https://github.com/prscX/react-native-photo-editor/issues/104), [#93](https://github.com/prscX/react-native-photo-editor/issues/93)
+  - Add the following to your `podfile -> ios/podfile` and run `pod install`
+```
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if pod.name.start_with?('RNFB')
+      def pod.build_type;
+        Pod::Target::BuildType.static_library
+      end
+    end
+  end
+end
+```
 
-## ⛄️ Stickers
-
-If you want to add custom stickers, please add them to your native project:
-
-* **iOS:** Add stickers to iOS Resources folder
-* **Android:** Add stickers to app `drawable` folder
-
+  - If the above doesn't work, try the following and and re-run `pod install`:
+```
+1. Open .podspec in node_modules/@react-native-firebase/app, auth, firestore (and any other @react-native-firebase libraries you're using)
+2. Manually change s.static_framework = false to s.static_framework = true.
+```
 
 ## ✨ Credits
 

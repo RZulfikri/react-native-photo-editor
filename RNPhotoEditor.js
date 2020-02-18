@@ -24,7 +24,7 @@ class PhotoEditor extends PureComponent {
       "#000000",
       "#808080",
       "#a9a9a9",
-      "#FFFFFF",
+      "#FFFFFE",
       "#0000ff",
       "#00ff00",
       "#ff0000",
@@ -45,11 +45,11 @@ class PhotoEditor extends PureComponent {
 
     RNPhotoEditor.Edit(
       props,
-      (args) => {
-        props.onDone && props.onDone(args);
+      (...args) => {
+        props.onDone && props.onDone(...args);
       },
-      (args) => {
-        props.onCancel && props.onCancel(args);
+      (...args) => {
+        props.onCancel && props.onCancel(...args);
       }
     );
   }
